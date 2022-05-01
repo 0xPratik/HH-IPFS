@@ -38,7 +38,7 @@ const Home: NextPage = () => {
     const transaction = Transaction.from(
       Buffer.from(json.transaction, "base64")
     );
-    console.log(transaction);
+    console.log("Transaction", transaction);
     const val = transaction.signatures;
     val.forEach((v) => {
       console.log("SIGNATORIES", v.publicKey.toString());
@@ -56,7 +56,7 @@ const Home: NextPage = () => {
 
   console.log("BASE URL", baseUrl);
 
-  const link = `${baseUrl}/api?`;
+  const link = `${baseUrl}/api`;
   console.log(link);
   const label = "Pratik";
   const message = "Hi From Pratik Saria";
