@@ -1,8 +1,32 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
+import "../styles/globals.css";
+import type { AppProps } from "next/app";
+import { AppContext, default as NextApp } from "next/app";
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+import { ChakraProvider } from "@chakra-ui/react";
+import { ConfigProvider } from "../contexts";
+
+interface MyAppProps extends AppProps {
+  host: string;
 }
 
-export default MyApp
+function MyApp({ Component, pageProps, host }: MyAppProps) {
+  const baseUrl = `https://${host}`;
+  return (
+    <ChakraProvider>
+      <Component {...pageProps} />
+    </ChakraProvider>
+  );
+}
+
+MyApp.getInitialProps = async (appContext: AppContext) => {
+  const props = await NextApp.getInitialProps(appContext);
+  const { req } = appContext.ctx;
+  const host = req?.headers.host || "localhost:3000";
+
+  return {
+    ...props,
+    host,
+  };
+};
+
+export default MyApp;
