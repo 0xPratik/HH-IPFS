@@ -12,9 +12,11 @@ interface MyAppProps extends AppProps {
 function MyApp({ Component, pageProps, host }: MyAppProps) {
   const baseUrl = `https://${host}`;
   return (
-    <ChakraProvider>
-      <Component {...pageProps} />
-    </ChakraProvider>
+    <ConfigProvider baseUrl={baseUrl}>
+      <ChakraProvider>
+        <Component {...pageProps} />
+      </ChakraProvider>
+    </ConfigProvider>
   );
 }
 
