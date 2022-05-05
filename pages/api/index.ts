@@ -15,7 +15,16 @@ import {
   createInitializeMintInstruction,
   getAssociatedTokenAddress,
   createAssociatedTokenAccountInstruction,
+  createMintToInstruction,
 } from "@solana/spl-token";
+import {
+  createCreateMetadataAccountV2Instruction,
+  DataV2,
+} from "@metaplex-foundation/mpl-token-metadata";
+import {
+  CreateMetadataAccountV2InstructionArgs,
+  createCreateMasterEditionV3Instruction,
+} from "@metaplex-foundation/mpl-token-metadata";
 
 export type MakeTransactionInputData = {
   account: string;
@@ -132,81 +141,141 @@ const handler = nextConnect()
       const programId = new anchor.web3.PublicKey(
         "EoBG2VasooF76AX25K6Bsm8BMnimMKQi6JcFj6CMCSA1"
       );
-
       const program = new anchor.Program(idl, programId, provider);
 
-      const adminKey = new anchor.web3.PublicKey(
-        "BZ45rj3gVx8pgqVmtYSCWwu8n6tEyCT4aHSyGkpgRCr8"
-      );
-      const [admin, nonce] = await anchor.web3.PublicKey.findProgramAddress(
-        [Buffer.from("admin"), adminKey.toBuffer()],
-        program.programId
-      );
+      // const adminKey = new anchor.web3.PublicKey(
+      //   "BZ45rj3gVx8pgqVmtYSCWwu8n6tEyCT4aHSyGkpgRCr8"
+      // );
       const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
         "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
       );
 
       const mintKey = anchor.web3.Keypair.generate();
 
-      // const mintKeynew = new anchor.web3.PublicKey(mintKey);
-
       console.log("Mint Key", mintKey.publicKey.toString());
-
+      console.log("WORKING here");
       const lamports =
         await program.provider.connection.getMinimumBalanceForRentExemption(
           MINT_SIZE
         );
 
-      // let ata = await getAssociatedTokenAddress(
-      //   mintKey.publicKey, // mint
-      //   user // owner
-      // );
+      let ata = await getAssociatedTokenAddress(
+        mintKey.publicKey, // mint
+        user // owner
+      );
 
-      // transaction.add(
-      //   anchor.web3.SystemProgram.createAccount({
-      //     fromPubkey: user,
-      //     newAccountPubkey: mintKey.publicKey,
-      //     space: MINT_SIZE,
-      //     lamports,
-      //     programId: TOKEN_PROGRAM_ID,
-      //   }),
-      //   createInitializeMintInstruction(
-      //     mintKey.publicKey, // mint pubkey
-      //     0, // decimals
-      //     user, // mint authority
-      //     user // freeze authority (you can use `null` to disable it. when you disable it, you can't turn it on again)
-      //   ),
-      //   createAssociatedTokenAccountInstruction(
-      //     user,
-      //     ata,
-      //     user,
-      //     mintKey.publicKey
-      //   )
-      // );
-      // console.log("Partial Tx", transaction);
-      // transaction.partialSign(mintKey);
+      transaction.add(
+        anchor.web3.SystemProgram.createAccount({
+          fromPubkey: user,
+          newAccountPubkey: mintKey.publicKey,
+          space: MINT_SIZE,
+          lamports,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        createInitializeMintInstruction(
+          mintKey.publicKey, // mint pubkey
+          0, // decimals
+          user, // mint authority
+          user // freeze authority (you can use `null` to disable it. when you disable it, you can't turn it on again)
+        ),
+        createAssociatedTokenAccountInstruction(
+          user,
+          ata,
+          user,
+          mintKey.publicKey
+        ),
+        createMintToInstruction(
+          mintKey.publicKey, // mint
+          ata,
+          user,
+          1
+        )
+      );
+      console.log("Partial Tx", transaction);
 
-      // const [metadatakey] = await anchor.web3.PublicKey.findProgramAddress(
-      //   [
-      //     Buffer.from("metadata"),
-      //     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-      //     mintKey.publicKey.toBuffer(),
-      //   ],
-      //   TOKEN_METADATA_PROGRAM_ID
-      // );
-      // console.log("METDATA", metadatakey.toString());
+      const [metadatakey] = await anchor.web3.PublicKey.findProgramAddress(
+        [
+          Buffer.from("metadata"),
+          TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+          mintKey.publicKey.toBuffer(),
+        ],
+        TOKEN_METADATA_PROGRAM_ID
+      );
+      console.log("METDATA", metadatakey.toString());
 
-      // const [masterKey] = await anchor.web3.PublicKey.findProgramAddress(
-      //   [
-      //     Buffer.from("metadata"),
-      //     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-      //     mintKey.publicKey.toBuffer(),
-      //     Buffer.from("edition"),
-      //   ],
-      //   TOKEN_METADATA_PROGRAM_ID
-      // );
+      const [masterKey] = await anchor.web3.PublicKey.findProgramAddress(
+        [
+          Buffer.from("metadata"),
+          TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+          mintKey.publicKey.toBuffer(),
+          Buffer.from("edition"),
+        ],
+        TOKEN_METADATA_PROGRAM_ID
+      );
 
-      // console.log("MASTER", masterKey.toString());
+      console.log("MASTER", masterKey.toString());
+
+      const data: DataV2 = {
+        name: "Pratik",
+        symbol: "PAT",
+        uri: "https://arweave.net/sCuT4ASiUgq7JxgU_3aoq0xJLpwH2Z1z2R2_xwPM8uc",
+        sellerFeeBasisPoints: 1000,
+        creators: [
+          {
+            address: new anchor.web3.PublicKey(
+              "9iSD3wkC1aq3FcwgjJfEua9FkkZJWv7Cuxs6sKjc3VnR"
+            ),
+            verified: false,
+            share: 100,
+          },
+        ],
+        collection: null,
+        uses: null,
+      };
+
+      const args = {
+        data,
+        isMutable: false,
+      };
+
+      const createMetadataV2 = createCreateMetadataAccountV2Instruction(
+        {
+          metadata: metadatakey,
+          mint: mintKey.publicKey,
+          mintAuthority: user,
+          payer: user,
+          updateAuthority: user,
+        },
+        {
+          createMetadataAccountArgsV2: args,
+        }
+      );
+
+      transaction.add(createMetadataV2);
+      const createMasterEditionV3 = createCreateMasterEditionV3Instruction(
+        {
+          edition: masterKey,
+          mint: mintKey.publicKey,
+          updateAuthority: user,
+          mintAuthority: user,
+          payer: user,
+          metadata: metadatakey,
+        },
+        {
+          createMasterEditionArgs: {
+            maxSupply: new anchor.BN(1),
+          },
+        }
+      );
+
+      createMasterEditionV3.keys.push({
+        pubkey: new PublicKey(reference),
+        isSigner: false,
+        isWritable: false,
+      });
+      transaction.add(createMasterEditionV3);
+
+      transaction.partialSign(mintKey);
 
       // const treasury = new anchor.web3.PublicKey(
       //   "9iSD3wkC1aq3FcwgjJfEua9FkkZJWv7Cuxs6sKjc3VnR"
@@ -236,27 +305,21 @@ const handler = nextConnect()
       //   }
       // );
 
-      const [vote, _votebump] = await anchor.web3.PublicKey.findProgramAddress(
-        [Buffer.from("vote_account")],
-        program.programId
-      );
+      // const [vote, _votebump] = await anchor.web3.PublicKey.findProgramAddress(
+      //   [Buffer.from("vote_account")],
+      //   program.programId
+      // );
 
-      const ix = await program.instruction.voteSuperMan({
-        accounts: {
-          voteAccount: vote,
-        },
-      });
+      // const ix = await program.instruction.voteSuperMan({
+      //   accounts: {
+      //     voteAccount: vote,
+      //   },
+      // });
 
-      ix.keys.push({
-        pubkey: new PublicKey(reference),
-        isSigner: false,
-        isWritable: false,
-      });
+      // ix.keys.forEach((key: any) =>
+      //   console.log(key.pubkey.toString(), key.isSigner)
+      // );
 
-      ix.keys.forEach((key: any) =>
-        console.log(key.pubkey.toString(), key.isSigner)
-      );
-      transaction.add(ix);
       // transaction.partialSign(mintKey);
 
       // Serialize the transaction and convert to base64 to return it

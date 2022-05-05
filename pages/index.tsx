@@ -116,9 +116,9 @@ const Home: NextPage = () => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   getTransaction();
-  // }, [wallet.publicKey]);
+  useEffect(() => {
+    getTransaction();
+  }, [wallet.publicKey]);
 
   const reference = useMemo(() => Keypair.generate().publicKey, []);
   const searchParams = new URLSearchParams();
