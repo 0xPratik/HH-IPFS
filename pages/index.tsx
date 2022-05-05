@@ -82,6 +82,7 @@ const Home: NextPage = () => {
         const signatureInfo = await findReference(connection, reference, {
           finality: "confirmed",
         });
+        console.log(signatureInfo);
         // Validate that the transaction has the expected recipient, amount and SPL token
         if (signatureInfo) {
           toast({
