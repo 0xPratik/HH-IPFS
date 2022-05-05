@@ -79,19 +79,23 @@ const Home: NextPage = () => {
     const interval = setInterval(async () => {
       try {
         // Check if there is any transaction for the reference
-        const signatureInfo = await findReference(connection, reference, {
+        const signatureInfo: any = await findReference(connection, reference, {
           finality: "confirmed",
         });
-        console.log(signatureInfo);
+        console.log(signatureInfo.signature);
         // Validate that the transaction has the expected recipient, amount and SPL token
-        if (signatureInfo) {
+        if (
+          signatureInfo.signature !== null &&
+          signatureInfo.confirmationStatus == "finalized"
+        ) {
           toast({
             title: "Transaction found",
-            description: "You have done the Vote transaction",
+            description: signatureInfo.signature,
             status: "success",
             duration: 9000,
             isClosable: true,
           });
+          return;
         }
       } catch (e) {
         if (e instanceof FindReferenceError) {
