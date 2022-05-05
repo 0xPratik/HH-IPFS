@@ -2,8 +2,23 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
-import { Box, Heading, Text, Container, Flex, Center } from "@chakra-ui/react";
-import { createQR, encodeURL } from "@solana/pay";
+import {
+  Box,
+  Heading,
+  Text,
+  Container,
+  Flex,
+  Center,
+  useToast,
+} from "@chakra-ui/react";
+import {
+  createQR,
+  encodeURL,
+  findReference,
+  FindReferenceError,
+  validateTransfer,
+  ValidateTransferError,
+} from "@solana/pay";
 import { useConfig } from "../contexts";
 import { useEffect, useMemo, useRef } from "react";
 // import * as anchor from "@project-serum/anchor";
@@ -15,7 +30,7 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 const Home: NextPage = () => {
   const { connection } = useConnection();
   const wallet = useWallet();
-
+  const toast = useToast();
   async function getTransaction() {
     if (!wallet.publicKey) {
       return;
@@ -59,6 +74,41 @@ const Home: NextPage = () => {
       console.log("TX", error);
     }
   }
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        // Check if there is any transaction for the reference
+        const signatureInfo = await findReference(connection, reference, {
+          finality: "confirmed",
+        });
+        // Validate that the transaction has the expected recipient, amount and SPL token
+        if (signatureInfo) {
+          toast({
+            title: "Transaction found",
+            description: "You have done the Vote transaction",
+            status: "success",
+            duration: 9000,
+            isClosable: true,
+          });
+        }
+      } catch (e) {
+        if (e instanceof FindReferenceError) {
+          // No transaction found yet, ignore this error
+          return;
+        }
+        if (e instanceof ValidateTransferError) {
+          // Transaction is invalid
+          console.error("Transaction is invalid", e);
+          return;
+        }
+        console.error("Unknown error", e);
+      }
+    }, 500);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   // useEffect(() => {
   //   getTransaction();
