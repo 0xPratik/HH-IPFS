@@ -70,15 +70,14 @@ const Home: NextPage = () => {
 
   const { baseUrl } = useConfig();
 
-  console.log("BASE URL", baseUrl);
-
   const link = `${baseUrl}/api?${searchParams.toString()}`;
 
-  console.log(link);
+  console.log("LINK", link);
   const label = "Pratik";
   const message = "Hi From Pratik Saria";
 
   const url = encodeURL({ link: new URL(link), label, message });
+  console.log("Encoding this URL", url);
   const qrRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -90,8 +89,15 @@ const Home: NextPage = () => {
   }, [url]);
 
   return (
-    <Center w="100vw" h="100vh" bg="blueviolet" color="white">
+    <Center
+      w="100vw"
+      h="100vh"
+      flexDir={"column"}
+      bg="blueviolet"
+      color="white"
+    >
       <div ref={qrRef} style={{ background: "white" }} />
+      <h1>There is a Login Button</h1>
       <WalletMultiButton />
     </Center>
   );
