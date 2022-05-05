@@ -5,20 +5,27 @@ import styles from "../styles/Home.module.css";
 import { Box, Heading, Text, Container, Flex, Center } from "@chakra-ui/react";
 import { createQR, encodeURL } from "@solana/pay";
 import { useConfig } from "../contexts";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 // import * as anchor from "@project-serum/anchor";
 import { Transaction } from "@solana/web3.js";
 import { Keypair, Connection } from "@solana/web3.js";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 const Home: NextPage = () => {
+  const { connection } = useConnection();
+  const wallet = useWallet();
+
   async function getTransaction() {
-    const test = new Keypair().publicKey;
+    if (!wallet.publicKey) {
+      return;
+    }
 
     const body = {
-      account: test.toString(),
+      account: wallet.publicKey.toString(),
     };
 
-    const response = await fetch(`/api`, {
+    const response = await fetch(`/api?${searchParams.toString()}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -38,25 +45,35 @@ const Home: NextPage = () => {
     const transaction = Transaction.from(
       Buffer.from(json.transaction, "base64")
     );
-    console.log("Transaction", transaction);
+    console.log(transaction);
     const val = transaction.signatures;
     val.forEach((v) => {
-      console.log("SIGNATORIES", v.publicKey.toString());
+      console.log(v.publicKey.toString());
     });
-    // transaction.partialSign(mintKey);
     try {
-      const endpoint = "https://metaplex.devnet.rpcpool.com/";
+      const endpoint = "https://api.devnet.solana.com";
       const connection = new Connection(endpoint);
+      const data = await wallet.sendTransaction(transaction, connection);
+      console.log(data);
     } catch (error) {
       console.log("TX", error);
     }
   }
 
+  // useEffect(() => {
+  //   getTransaction();
+  // }, [wallet.publicKey]);
+
+  const reference = useMemo(() => Keypair.generate().publicKey, []);
+  const searchParams = new URLSearchParams();
+  searchParams.append("reference", reference.toString());
+
   const { baseUrl } = useConfig();
 
   console.log("BASE URL", baseUrl);
 
-  const link = `${baseUrl}/api`;
+  const link = `${baseUrl}/api?${searchParams.toString()}`;
+
   console.log(link);
   const label = "Pratik";
   const message = "Hi From Pratik Saria";
@@ -72,12 +89,10 @@ const Home: NextPage = () => {
     }
   }, [url]);
 
-  useEffect(() => {
-    getTransaction();
-  }, []);
   return (
     <Center w="100vw" h="100vh" bg="blueviolet" color="white">
       <div ref={qrRef} style={{ background: "white" }} />
+      <WalletMultiButton />
     </Center>
   );
 };

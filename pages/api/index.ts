@@ -42,9 +42,8 @@ const handler = nextConnect()
   )
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
     try {
-      // const { reference } = req.query;
+      const { reference } = req.query;
       // const { reference, mintKey } = req.query;
-      const reference = new anchor.web3.Keypair().publicKey.toString();
       console.log("QUERY", req.query);
       console.log("REFERENCE", reference);
       // console.log("MINTKEY", mintKey);
@@ -102,7 +101,6 @@ const handler = nextConnect()
       //   lamports: 1 * anchor.web3.LAMPORTS_PER_SOL,
       // });
       // transaction.add(t);
-      console.log("ADDED Tx", transaction);
 
       const TOKEN_PROGRAM_ID = new PublicKey(
         "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
@@ -131,9 +129,8 @@ const handler = nextConnect()
 
       const provider = getProvider();
       const idl = IDL as anchor.Idl;
-
       const programId = new anchor.web3.PublicKey(
-        "8hMzPj97uuekWKvbVd548FEFYz44FBQkkJQq3dDkJX6Y"
+        "EoBG2VasooF76AX25K6Bsm8BMnimMKQi6JcFj6CMCSA1"
       );
 
       const program = new anchor.Program(idl, programId, provider);
@@ -160,84 +157,95 @@ const handler = nextConnect()
           MINT_SIZE
         );
 
-      let ata = await getAssociatedTokenAddress(
-        mintKey.publicKey, // mint
-        user // owner
-      );
+      // let ata = await getAssociatedTokenAddress(
+      //   mintKey.publicKey, // mint
+      //   user // owner
+      // );
 
-      transaction.add(
-        anchor.web3.SystemProgram.createAccount({
-          fromPubkey: user,
-          newAccountPubkey: mintKey.publicKey,
-          space: MINT_SIZE,
-          lamports,
-          programId: TOKEN_PROGRAM_ID,
-        }),
-        createInitializeMintInstruction(
-          mintKey.publicKey, // mint pubkey
-          0, // decimals
-          user, // mint authority
-          user // freeze authority (you can use `null` to disable it. when you disable it, you can't turn it on again)
-        ),
-        createAssociatedTokenAccountInstruction(
-          user,
-          ata,
-          user,
-          mintKey.publicKey
-        )
-      );
-      console.log("Partial Tx", transaction);
+      // transaction.add(
+      //   anchor.web3.SystemProgram.createAccount({
+      //     fromPubkey: user,
+      //     newAccountPubkey: mintKey.publicKey,
+      //     space: MINT_SIZE,
+      //     lamports,
+      //     programId: TOKEN_PROGRAM_ID,
+      //   }),
+      //   createInitializeMintInstruction(
+      //     mintKey.publicKey, // mint pubkey
+      //     0, // decimals
+      //     user, // mint authority
+      //     user // freeze authority (you can use `null` to disable it. when you disable it, you can't turn it on again)
+      //   ),
+      //   createAssociatedTokenAccountInstruction(
+      //     user,
+      //     ata,
+      //     user,
+      //     mintKey.publicKey
+      //   )
+      // );
+      // console.log("Partial Tx", transaction);
       // transaction.partialSign(mintKey);
 
-      const [metadatakey] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-          Buffer.from("metadata"),
-          TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-          mintKey.publicKey.toBuffer(),
-        ],
-        TOKEN_METADATA_PROGRAM_ID
-      );
-      console.log("METDATA", metadatakey.toString());
+      // const [metadatakey] = await anchor.web3.PublicKey.findProgramAddress(
+      //   [
+      //     Buffer.from("metadata"),
+      //     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+      //     mintKey.publicKey.toBuffer(),
+      //   ],
+      //   TOKEN_METADATA_PROGRAM_ID
+      // );
+      // console.log("METDATA", metadatakey.toString());
 
-      const [masterKey] = await anchor.web3.PublicKey.findProgramAddress(
-        [
-          Buffer.from("metadata"),
-          TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-          mintKey.publicKey.toBuffer(),
-          Buffer.from("edition"),
-        ],
-        TOKEN_METADATA_PROGRAM_ID
+      // const [masterKey] = await anchor.web3.PublicKey.findProgramAddress(
+      //   [
+      //     Buffer.from("metadata"),
+      //     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+      //     mintKey.publicKey.toBuffer(),
+      //     Buffer.from("edition"),
+      //   ],
+      //   TOKEN_METADATA_PROGRAM_ID
+      // );
+
+      // console.log("MASTER", masterKey.toString());
+
+      // const treasury = new anchor.web3.PublicKey(
+      //   "9iSD3wkC1aq3FcwgjJfEua9FkkZJWv7Cuxs6sKjc3VnR"
+      // );
+
+      // const ix = await program.instruction.mintSolNft(
+      //   new anchor.BN(1 * anchor.web3.LAMPORTS_PER_SOL),
+      //   "Pratik",
+      //   "PAT",
+      //   "https://bafkreiftbyb4vht53hjxsypodrwd5qhjxwk33iezkxtid6wxggyj26dcji.ipfs.nftstorage.link/",
+      //   10000,
+      //   true,
+      //   {
+      //     accounts: {
+      //       admin: admin,
+      //       authority: user,
+      //       masterEdition: masterKey,
+      //       metadata: metadatakey,
+      //       mint: mintKey.publicKey,
+      //       mplProgram: TOKEN_METADATA_PROGRAM_ID,
+      //       rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+      //       systemProgram: anchor.web3.SystemProgram.programId,
+      //       tokenProgram: TOKEN_PROGRAM_ID,
+      //       treasuryAccount: treasury,
+      //       recipient: ata,
+      //     },
+      //   }
+      // );
+
+      const [vote, _votebump] = await anchor.web3.PublicKey.findProgramAddress(
+        [Buffer.from("vote_account")],
+        program.programId
       );
 
-      console.log("MASTER", masterKey.toString());
-
-      const treasury = new anchor.web3.PublicKey(
-        "9iSD3wkC1aq3FcwgjJfEua9FkkZJWv7Cuxs6sKjc3VnR"
-      );
-
-      const ix = await program.instruction.mintSolNft(
-        new anchor.BN(1 * anchor.web3.LAMPORTS_PER_SOL),
-        "Pratik",
-        "PAT",
-        "https://bafkreiftbyb4vht53hjxsypodrwd5qhjxwk33iezkxtid6wxggyj26dcji.ipfs.nftstorage.link/",
-        10000,
-        true,
-        {
-          accounts: {
-            admin: admin,
-            authority: user,
-            masterEdition: masterKey,
-            metadata: metadatakey,
-            mint: mintKey.publicKey,
-            mplProgram: TOKEN_METADATA_PROGRAM_ID,
-            rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            systemProgram: anchor.web3.SystemProgram.programId,
-            tokenProgram: TOKEN_PROGRAM_ID,
-            treasuryAccount: treasury,
-            recipient: ata,
-          },
-        }
-      );
+      const ix = await program.instruction.voteSuperMan({
+        accounts: {
+          voteAccount: vote,
+        },
+      });
 
       ix.keys.push({
         pubkey: new PublicKey(reference),
@@ -249,7 +257,7 @@ const handler = nextConnect()
         console.log(key.pubkey.toString(), key.isSigner)
       );
       transaction.add(ix);
-      transaction.partialSign(mintKey);
+      // transaction.partialSign(mintKey);
 
       // Serialize the transaction and convert to base64 to return it
       const serializedTransaction = transaction.serialize({
@@ -262,7 +270,7 @@ const handler = nextConnect()
 
       res.status(200).json({
         transaction: base64,
-        message: "Thanks for Initializing",
+        message: "Thanks for Minting NFT",
       });
     } catch (error) {
       console.log("SERVER ERROR PRATIK", error);
