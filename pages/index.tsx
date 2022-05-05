@@ -95,6 +95,7 @@ const Home: NextPage = () => {
             duration: 9000,
             isClosable: true,
           });
+          clearInterval(interval);
           return;
         }
       } catch (e) {
