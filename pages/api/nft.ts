@@ -163,6 +163,11 @@ const handler = nextConnect()
               "9iSD3wkC1aq3FcwgjJfEua9FkkZJWv7Cuxs6sKjc3VnR"
             ),
             verified: false,
+            share: 0,
+          },
+          {
+            address: user,
+            verified: false,
             share: 100,
           },
         ],

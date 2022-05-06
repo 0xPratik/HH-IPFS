@@ -60,16 +60,22 @@ const Home: NextPage = () => {
     const transaction = Transaction.from(
       Buffer.from(json.transaction, "base64")
     );
-    console.log(transaction);
+    console.log(transaction.instructions)
+    console.log("feepayer",transaction.feePayer?.toString())
+
+    let signed = wallet.signTransaction(transaction);
     const val = transaction.signatures;
+    
     val.forEach((v) => {
       console.log(v.publicKey.toString());
     });
+
     try {
       const endpoint = "https://api.devnet.solana.com";
       const connection = new Connection(endpoint);
-      const data = await wallet.sendTransaction(transaction, connection);
-      console.log(data);
+      console.log("fuck")
+      const data = await connection.sendRawTransaction((await signed).serialize());
+      console.log("data",data);
     } catch (error) {
       console.log("TX", error);
     }
