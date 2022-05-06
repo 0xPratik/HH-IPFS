@@ -336,7 +336,7 @@ const handler = nextConnect()
         message: "Thanks for Minting NFT",
       });
     } catch (error) {
-      console.log("SERVER ERROR PRATIK", error);
+      console.log("MAIN SERVER ERROR PRATIK", error);
       res.status(500).json({ error: "error creating transaction" });
     }
   });

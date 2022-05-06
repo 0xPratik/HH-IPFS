@@ -40,7 +40,7 @@ const Home: NextPage = () => {
       account: wallet.publicKey.toString(),
     };
 
-    const response = await fetch(`/api?${searchParams.toString()}/nft`, {
+    const response = await fetch(`/api/nft?${searchParams.toString()}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -126,14 +126,12 @@ const Home: NextPage = () => {
 
   const { baseUrl } = useConfig();
 
-  const link = `${baseUrl}/api?${searchParams.toString()}/nft`;
+  const link = `${baseUrl}/api/nft?${searchParams.toString()}`;
 
-  console.log("LINK", link);
   const label = "Pratik";
   const message = "Hi From Pratik Saria";
 
   const url = encodeURL({ link: new URL(link), label, message });
-  console.log("Encoding this URL", url);
   const qrRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

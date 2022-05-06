@@ -24,6 +24,7 @@ const handler = nextConnect()
   })
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
     try {
+      console.log("INSIDE SEND");
       const { reference } = req.query;
 
       console.log("REFERECE is --", reference);
