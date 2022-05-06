@@ -63,22 +63,25 @@ const Home: NextPage = () => {
     console.log(transaction.instructions)
     console.log("feepayer",transaction.feePayer?.toString())
 
-    let signed = wallet.signTransaction(transaction);
-    const val = transaction.signatures;
-    
-    val.forEach((v) => {
-      console.log(v.publicKey.toString());
-    });
+    if (wallet.signTransaction) {
+      let signed = wallet.signTransaction(transaction);
+      const val = transaction.signatures;
 
-    try {
-      const endpoint = "https://api.devnet.solana.com";
-      const connection = new Connection(endpoint);
-      console.log("fuck")
-      const data = await connection.sendRawTransaction((await signed).serialize());
-      console.log("data",data);
-    } catch (error) {
-      console.log("TX", error);
+      val.forEach((v) => {
+        console.log(v.publicKey.toString());
+      });
+  
+      try {
+        const endpoint = "https://api.devnet.solana.com";
+        const connection = new Connection(endpoint);
+        console.log("fuck")
+        const data = await connection.sendRawTransaction((await signed).serialize());
+        console.log("data",data);
+      } catch (error) {
+        console.log("TX", error);
+      }
     }
+
   }
 
   useEffect(() => {
