@@ -20,7 +20,7 @@ import {
   ValidateTransferError,
 } from "@solana/pay";
 import { useConfig } from "../contexts";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 // import * as anchor from "@project-serum/anchor";
 import { Transaction } from "@solana/web3.js";
 import { Keypair, Connection } from "@solana/web3.js";
@@ -30,6 +30,8 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 const Home: NextPage = () => {
   const { connection } = useConnection();
   const wallet = useWallet();
+  const [show, setShow] = useState<boolean>(false);
+  const [sig, setSig] = useState<string>("");
   const toast = useToast();
   async function getTransaction() {
     if (!wallet.publicKey) {
@@ -60,8 +62,8 @@ const Home: NextPage = () => {
     const transaction = Transaction.from(
       Buffer.from(json.transaction, "base64")
     );
-    console.log(transaction.instructions)
-    console.log("feepayer",transaction.feePayer?.toString())
+    console.log(transaction.instructions);
+    console.log("feepayer", transaction.feePayer?.toString());
 
     if (wallet.signTransaction) {
       let signed = wallet.signTransaction(transaction);
@@ -70,19 +72,32 @@ const Home: NextPage = () => {
       val.forEach((v) => {
         console.log(v.publicKey.toString());
       });
-  
+
       try {
         const endpoint = "https://api.devnet.solana.com";
         const connection = new Connection(endpoint);
-        console.log("fuck")
-        const data = await connection.sendRawTransaction((await signed).serialize());
-        console.log("data",data);
+        console.log("fuck");
+        const data = await connection.sendRawTransaction(
+          (await signed).serialize()
+        );
+        console.log("data", data);
       } catch (error) {
         console.log("TX", error);
       }
     }
-
   }
+
+  useEffect(() => {
+    if (show === true) {
+      toast({
+        title: "Transaction found",
+        description: sig,
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
+  }, [show]);
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -91,20 +106,13 @@ const Home: NextPage = () => {
         const signatureInfo: any = await findReference(connection, reference, {
           finality: "confirmed",
         });
-        console.log(signatureInfo.signature);
+        setSig(signatureInfo.signature);
         // Validate that the transaction has the expected recipient, amount and SPL token
         if (
           signatureInfo.signature !== null &&
           signatureInfo.confirmationStatus == "finalized"
         ) {
-          toast({
-            title: "Transaction found",
-            description: signatureInfo.signature,
-            status: "success",
-            duration: 9000,
-            isClosable: true,
-          });
-          clearInterval(interval);
+          setShow(true);
           return;
         }
       } catch (e) {
@@ -125,9 +133,9 @@ const Home: NextPage = () => {
     };
   }, []);
 
-  useEffect(() => {
-    getTransaction();
-  }, [wallet.publicKey]);
+  // useEffect(() => {
+  //   getTransaction();
+  // }, [wallet.publicKey]);
 
   const reference = useMemo(() => Keypair.generate().publicKey, []);
   const searchParams = new URLSearchParams();
@@ -160,8 +168,8 @@ const Home: NextPage = () => {
       color="white"
     >
       <div ref={qrRef} style={{ background: "white" }} />
-      <h1>There is a Login Button</h1>
-      <WalletMultiButton />
+      {/* <h1>There is a Login Button</h1>
+      <WalletMultiButton /> */}
     </Center>
   );
 };
