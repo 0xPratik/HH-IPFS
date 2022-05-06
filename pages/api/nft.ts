@@ -153,9 +153,9 @@ const handler = nextConnect()
       console.log("MASTER", masterKey.toString());
 
       const data: DataV2 = {
-        name: "Pratik",
-        symbol: "PAT",
-        uri: "https://arweave.net/sCuT4ASiUgq7JxgU_3aoq0xJLpwH2Z1z2R2_xwPM8uc",
+        name: "SuperTeam",
+        symbol: "SUPR",
+        uri: "https://metadata.degods.com/g/4924.json",
         sellerFeeBasisPoints: 1000,
         creators: [
           {
