@@ -40,7 +40,7 @@ const Home: NextPage = () => {
       account: wallet.publicKey.toString(),
     };
 
-    const response = await fetch(`/api?${searchParams.toString()}`, {
+    const response = await fetch(`/api?${searchParams.toString()}/nft`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -126,7 +126,7 @@ const Home: NextPage = () => {
 
   const { baseUrl } = useConfig();
 
-  const link = `${baseUrl}/api?${searchParams.toString()}`;
+  const link = `${baseUrl}/api?${searchParams.toString()}/nft`;
 
   console.log("LINK", link);
   const label = "Pratik";
