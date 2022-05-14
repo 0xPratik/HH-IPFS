@@ -20,11 +20,9 @@ import {
 import {
   createCreateMetadataAccountV2Instruction,
   DataV2,
+  createUpdateMetadataAccountV2Instruction,
 } from "@metaplex-foundation/mpl-token-metadata";
-import {
-  CreateMetadataAccountV2InstructionArgs,
-  createCreateMasterEditionV3Instruction,
-} from "@metaplex-foundation/mpl-token-metadata";
+import { createCreateMasterEditionV3Instruction } from "@metaplex-foundation/mpl-token-metadata";
 
 export type MakeTransactionInputData = {
   account: string;
@@ -51,11 +49,9 @@ const handler = nextConnect()
   )
   .post(async (req: NextApiRequest, res: NextApiResponse) => {
     try {
-      const { reference, metadata } = req.query;
+      const { reference } = req.query;
 
       console.log("REFERENCE", reference);
-
-      console.log("METADATA", metadata);
 
       if (!reference) {
         res.status(400).json({ error: "No reference provided" });
@@ -154,48 +150,48 @@ const handler = nextConnect()
 
       console.log("MASTER", masterKey.toString());
 
-      // const data: DataV2 = {
-      //   name: "Hacker House",
-      //   symbol: "HH",
-      //   uri: metadata,
-      //   sellerFeeBasisPoints: 1000,
-      //   creators: [
-      //     {
-      //       address: new anchor.web3.PublicKey(
-      //         "9iSD3wkC1aq3FcwgjJfEua9FkkZJWv7Cuxs6sKjc3VnR"
-      //       ),
-      //       verified: false,
-      //       share: 0,
-      //     },
-      //     {
-      //       address: user,
-      //       verified: false,
-      //       share: 100,
-      //     },
-      //   ],
-      //   collection: null,
-      //   uses: null,
-      // };
+      const data: DataV2 = {
+        name: "SuperTeam",
+        symbol: "SUPR",
+        uri: "https://metadata.degods.com/g/4924.json",
+        sellerFeeBasisPoints: 1000,
+        creators: [
+          {
+            address: new anchor.web3.PublicKey(
+              "9iSD3wkC1aq3FcwgjJfEua9FkkZJWv7Cuxs6sKjc3VnR"
+            ),
+            verified: false,
+            share: 0,
+          },
+          {
+            address: user,
+            verified: false,
+            share: 100,
+          },
+        ],
+        collection: null,
+        uses: null,
+      };
 
-      // const args = {
-      //   data,
-      //   isMutable: false,
-      // };
+      const args = {
+        data,
+        isMutable: false,
+      };
 
-      // const createMetadataV2 = createCreateMetadataAccountV2Instruction(
-      //   {
-      //     metadata: metadatakey,
-      //     mint: mintKey.publicKey,
-      //     mintAuthority: user,
-      //     payer: user,
-      //     updateAuthority: user,
-      //   },
-      //   {
-      //     createMetadataAccountArgsV2: args,
-      //   }
-      // );
+      const createMetadataV2 = createCreateMetadataAccountV2Instruction(
+        {
+          metadata: metadatakey,
+          mint: mintKey.publicKey,
+          mintAuthority: user,
+          payer: user,
+          updateAuthority: user,
+        },
+        {
+          createMetadataAccountArgsV2: args,
+        }
+      );
 
-      // transaction.add(createMetadataV2);
+      transaction.add(createMetadataV2);
       const createMasterEditionV3 = createCreateMasterEditionV3Instruction(
         {
           edition: masterKey,
@@ -208,6 +204,44 @@ const handler = nextConnect()
         {
           createMasterEditionArgs: {
             maxSupply: new anchor.BN(1),
+          },
+        }
+      );
+
+      const updated_data: DataV2 = {
+        name: "SuperTeam",
+        symbol: "SUPR",
+        uri: "https://metadata.degods.com/g/4924.json",
+        sellerFeeBasisPoints: 1000,
+        creators: [
+          {
+            address: new anchor.web3.PublicKey(
+              "9iSD3wkC1aq3FcwgjJfEua9FkkZJWv7Cuxs6sKjc3VnR"
+            ),
+            verified: false,
+            share: 0,
+          },
+          {
+            address: user,
+            verified: false,
+            share: 100,
+          },
+        ],
+        collection: null,
+        uses: null,
+      };
+
+      const updateMetadataAccount = createUpdateMetadataAccountV2Instruction(
+        {
+          metadata: metadatakey,
+          updateAuthority: user,
+        },
+        {
+          updateMetadataAccountArgsV2: {
+            data: updated_data,
+            updateAuthority: user,
+            primarySaleHappened: true,
+            isMutable: true,
           },
         }
       );
@@ -228,12 +262,10 @@ const handler = nextConnect()
 
       console.log(base64);
 
-      res.status(200).json("OK");
-
-      // res.status(200).json({
-      //   transaction: base64,
-      //   message: "Thanks for Minting NFT",
-      // });
+      res.status(200).json({
+        transaction: base64,
+        message: "Thanks for Minting NFT",
+      });
     } catch (error) {
       console.log("Minting SERVER ERROR PRATIK", error);
       res.status(500).json({ error: "error creating transaction" });
