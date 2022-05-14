@@ -42,6 +42,9 @@ const Home: NextPage = () => {
   const photoRef = useRef(null);
   const [metadataURL, setMetadataURL] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [textmessage, setTextMessage] = useState<string>(
+    "Uploading files to IPFS"
+  );
 
   const getVideo = () => {
     if (typeof window !== "undefined") {
@@ -119,10 +122,14 @@ const Home: NextPage = () => {
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDg0QTA4MjA3YjRkQWU2MjFGN2YwZEZmMkM5QzM2RkQ1NTlGMjg0REUiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2NTIyNzEyNDcxODYsIm5hbWUiOiJQcmF0aWsifQ.Ucs3mGMnN3bMzUHqCqHsM8FaHBL4hY27rLB-nEKWG8g",
     });
 
+    setTextMessage("Uploading your Photo to IPFS");
     const cid = await client.put([file]);
+
     console.log("Uploaded to IPFS", cid);
 
     const imageURL = getUrl(cid, "photo.png");
+
+    setTextMessage("Uploaded your Photo to IPFS");
 
     const metadata = {
       name: "Okay Bear #4438",
@@ -184,8 +191,10 @@ const Home: NextPage = () => {
     });
 
     const metadataFile = new File([blob], "metadata.json");
+    setTextMessage("Uploading Metadata to IPFS");
     const meta_cid = await client.put([metadataFile]);
     console.log("Uploaded MEtadata to IPFS", meta_cid);
+    setTextMessage("Uploaded Metadata to IPFS");
 
     const metadataURL = getUrl(meta_cid, "metadata.json");
 
@@ -342,7 +351,7 @@ const Home: NextPage = () => {
       {loading && (
         <>
           <Spinner size="xl" />
-          <Text>Uploading Image and Metadata to IPFS please wait</Text>
+          <Text>{textmessage}</Text>
         </>
       )}
 
