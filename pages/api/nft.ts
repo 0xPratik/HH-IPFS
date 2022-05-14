@@ -140,7 +140,7 @@ const handler = nextConnect()
         ],
         TOKEN_METADATA_PROGRAM_ID
       );
-      console.log("METADATA", metadatakey.toString());
+      console.log("METADATA --", metadatakey.toString());
 
       const [masterKey] = await anchor.web3.PublicKey.findProgramAddress(
         [
@@ -152,50 +152,52 @@ const handler = nextConnect()
         TOKEN_METADATA_PROGRAM_ID
       );
 
-      console.log("MASTER", masterKey.toString());
+      console.log("MASTER --", masterKey.toString());
 
-      // const data: DataV2 = {
-      //   name: "Hacker House",
-      //   symbol: "HH",
-      //   uri: metadata,
-      //   sellerFeeBasisPoints: 1000,
-      //   creators: [
-      //     {
-      //       address: new anchor.web3.PublicKey(
-      //         "9iSD3wkC1aq3FcwgjJfEua9FkkZJWv7Cuxs6sKjc3VnR"
-      //       ),
-      //       verified: false,
-      //       share: 0,
-      //     },
-      //     {
-      //       address: user,
-      //       verified: false,
-      //       share: 100,
-      //     },
-      //   ],
-      //   collection: null,
-      //   uses: null,
-      // };
+      const stringMetadata: string = metadata.toString();
 
-      // const args = {
-      //   data,
-      //   isMutable: false,
-      // };
+      const data: DataV2 = {
+        name: "Hacker House",
+        symbol: "HH",
+        uri: stringMetadata,
+        sellerFeeBasisPoints: 1000,
+        creators: [
+          {
+            address: new anchor.web3.PublicKey(
+              "9iSD3wkC1aq3FcwgjJfEua9FkkZJWv7Cuxs6sKjc3VnR"
+            ),
+            verified: false,
+            share: 100,
+          },
+          {
+            address: user,
+            verified: false,
+            share: 0,
+          },
+        ],
+        collection: null,
+        uses: null,
+      };
 
-      // const createMetadataV2 = createCreateMetadataAccountV2Instruction(
-      //   {
-      //     metadata: metadatakey,
-      //     mint: mintKey.publicKey,
-      //     mintAuthority: user,
-      //     payer: user,
-      //     updateAuthority: user,
-      //   },
-      //   {
-      //     createMetadataAccountArgsV2: args,
-      //   }
-      // );
+      const args = {
+        data,
+        isMutable: false,
+      };
 
-      // transaction.add(createMetadataV2);
+      const createMetadataV2 = createCreateMetadataAccountV2Instruction(
+        {
+          metadata: metadatakey,
+          mint: mintKey.publicKey,
+          mintAuthority: user,
+          payer: user,
+          updateAuthority: user,
+        },
+        {
+          createMetadataAccountArgsV2: args,
+        }
+      );
+
+      transaction.add(createMetadataV2);
       const createMasterEditionV3 = createCreateMasterEditionV3Instruction(
         {
           edition: masterKey,
@@ -226,14 +228,10 @@ const handler = nextConnect()
       });
       const base64 = serializedTransaction.toString("base64");
 
-      console.log(base64);
-
-      res.status(200).json("OK");
-
-      // res.status(200).json({
-      //   transaction: base64,
-      //   message: "Thanks for Minting NFT",
-      // });
+      res.status(200).json({
+        transaction: base64,
+        message: "Thanks for Minting NFT",
+      });
     } catch (error) {
       console.log("Minting SERVER ERROR PRATIK", error);
       res.status(500).json({ error: "error creating transaction" });

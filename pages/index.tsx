@@ -39,6 +39,7 @@ const Home: NextPage = () => {
   const videoRef = useRef(null);
   const photoRef = useRef(null);
   const [metadataURL, setMetadataURL] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const getVideo = () => {
     if (typeof window !== "undefined") {
@@ -93,6 +94,7 @@ const Home: NextPage = () => {
   };
 
   const clickPhoto = async () => {
+    setLoading(true);
     let width = 500;
     let height = width / (16 / 9);
 
@@ -187,6 +189,7 @@ const Home: NextPage = () => {
 
     console.log("Metadata URL", metadataURL);
     setMetadataURL(metadataURL);
+    setLoading(false);
   };
 
   async function getTransaction() {
@@ -232,7 +235,7 @@ const Home: NextPage = () => {
       try {
         const endpoint = "https://api.devnet.solana.com";
         const connection = new Connection(endpoint);
-        console.log("fuck");
+
         const data = await connection.sendRawTransaction(
           (await signed).serialize()
         );
@@ -327,6 +330,10 @@ const Home: NextPage = () => {
 
       <Button variant="solid" colorScheme="blue" onClick={clickPhoto}>
         Click Photo
+      </Button>
+      <WalletMultiButton />
+      <Button colorScheme="red" onClick={getTransaction} isLoading={loading}>
+        Do Tx
       </Button>
       <canvas ref={photoRef}></canvas>
     </Center>
