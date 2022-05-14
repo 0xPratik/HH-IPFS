@@ -164,7 +164,7 @@ const handler = nextConnect()
         creators: [
           {
             address: new anchor.web3.PublicKey(
-              "9iSD3wkC1aq3FcwgjJfEua9FkkZJWv7Cuxs6sKjc3VnR"
+              "BZ45rj3gVx8pgqVmtYSCWwu8n6tEyCT4aHSyGkpgRCr8"
             ),
             verified: false,
             share: 100,

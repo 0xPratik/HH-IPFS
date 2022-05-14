@@ -12,7 +12,9 @@ import {
   useToast,
   Button,
   Image as ChakraImage,
+  Spinner,
 } from "@chakra-ui/react";
+import { VisuallyHidden, VisuallyHiddenInput } from "@chakra-ui/react";
 import {
   createQR,
   encodeURL,
@@ -45,7 +47,7 @@ const Home: NextPage = () => {
     if (typeof window !== "undefined") {
       navigator.mediaDevices
         .getUserMedia({
-          video: { width: 1920, height: 1080 },
+          video: { width: window.screen.width, height: window.screen.height },
         })
         .then((stream) => {
           let video: any = videoRef.current;
@@ -90,12 +92,12 @@ const Home: NextPage = () => {
   }
 
   const getUrl = (cid: string, fileName: string) => {
-    return `${cid}.ipfs.dweb.link/${fileName}`;
+    return `https://${cid}.ipfs.dweb.link/${fileName}`;
   };
 
   const clickPhoto = async () => {
     setLoading(true);
-    let width = 500;
+    let width = 700;
     let height = width / (16 / 9);
 
     let video = videoRef.current;
@@ -320,23 +322,50 @@ const Home: NextPage = () => {
   }, [url]);
 
   return (
-    <Center w="100vw" h="100%" flexDir={"column"} bg="blueviolet" color="white">
+    <Box
+      w="100%"
+      h="100vh"
+      bg="blue.800"
+      color="white"
+      fontWeight="bold"
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+    >
       {/* <div ref={qrRef} style={{ background: "white" }} /> */}
 
-      {metadataURL === "" && <video ref={videoRef} />}
+      {metadataURL === "" && loading === false && <video ref={videoRef} />}
       {metadataURL !== "" && (
         <div ref={qrRef} style={{ background: "white" }} />
       )}
+      {loading && (
+        <>
+          <Spinner size="xl" />
+          <Text>Uploading Image and Metadata to IPFS please wait</Text>
+        </>
+      )}
 
-      <Button variant="solid" colorScheme="blue" onClick={clickPhoto}>
-        Click Photo
-      </Button>
-      <WalletMultiButton />
+      {!loading && (
+        <Button
+          variant="solid"
+          colorScheme="purple"
+          size="lg"
+          mt={"2"}
+          borderRadius={"full"}
+          onClick={clickPhoto}
+        >
+          {" "}
+        </Button>
+      )}
+      {/* <WalletMultiButton />
       <Button colorScheme="red" onClick={getTransaction} isLoading={loading}>
         Do Tx
-      </Button>
-      <canvas ref={photoRef}></canvas>
-    </Center>
+      </Button> */}
+      <VisuallyHidden>
+        <canvas ref={photoRef}></canvas>
+      </VisuallyHidden>
+    </Box>
   );
 };
 
