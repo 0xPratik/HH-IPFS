@@ -132,42 +132,33 @@ const Home: NextPage = () => {
     setTextMessage("Uploaded your Photo to IPFS");
 
     const metadata = {
-      name: "Okay Bear #4438",
-      symbol: "okay_bears",
-      description:
-        "Okay Bears is a culture shift. A clean collection of 10,000 diverse bears building a virtuous community that will transcend the internet into the real world.",
+      name: "Hacker House Bengaluru",
+      symbol: "BLR",
+      description: "I have been to the Hacker house Bengaluru",
       seller_fee_basis_points: 750,
       image: `${imageURL}?ext=png`,
-      external_url: "https://www.okaybears.com/",
+      external_url: "https://lu.ma/bengaluru-hacker-house?pk=g-dVB3i2wX6P8v6v9",
       attributes: [
         {
-          trait_type: "Background",
-          value: "Blue",
+          trait_type: "Organizer",
+          value: "Solana",
         },
         {
-          trait_type: "Fur",
-          value: "Dark Brown",
+          trait_type: "Organized for",
+          value: "Buildoors",
         },
         {
-          trait_type: "Mouth",
-          value: "Okay",
+          trait_type: "Country",
+          value: "India",
         },
         {
-          trait_type: "Eyes",
-          value: "Interested",
-        },
-        {
-          trait_type: "Hat",
-          value: "Sticky Note",
-        },
-        {
-          trait_type: "Clothes",
-          value: "Sleeveless Tee",
+          trait_type: "City",
+          value: "Bengaluru",
         },
       ],
       collection: {
-        name: "Okay Bears",
-        family: "Okay Bears",
+        name: "Bengaluru",
+        family: "Hacker house",
       },
       properties: {
         files: [
