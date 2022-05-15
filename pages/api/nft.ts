@@ -44,8 +44,8 @@ const handler = nextConnect()
   .get(
     (req: NextApiRequest, res: NextApiResponse<MakeTransactionGetResponse>) => {
       res.status(200).json({
-        label: "Mint NFT",
-        icon: "https://s2.svgbox.net/illlustrations.svg?ic=coffee",
+        label: "HH Bengaluru",
+        icon: "https://cryptologos.cc/logos/solana-sol-logo.png",
       });
     }
   )
@@ -230,7 +230,7 @@ const handler = nextConnect()
 
       res.status(200).json({
         transaction: base64,
-        message: "Thanks for Minting NFT",
+        message: "Thanks for comming to HH Bengaluru ",
       });
     } catch (error) {
       console.log("Minting SERVER ERROR PRATIK", error);
