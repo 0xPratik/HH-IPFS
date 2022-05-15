@@ -325,7 +325,7 @@ const Home: NextPage = () => {
     <Box
       w="100%"
       h="100vh"
-      bg="blue.800"
+      bg="teal"
       color="white"
       fontWeight="bold"
       display="flex"
@@ -349,7 +349,7 @@ const Home: NextPage = () => {
       {!loading && (
         <Button
           variant="solid"
-          colorScheme="purple"
+          colorScheme="orange"
           size="lg"
           mt={"2"}
           borderRadius={"full"}

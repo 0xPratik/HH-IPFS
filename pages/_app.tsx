@@ -50,7 +50,7 @@ function MyApp({ Component, pageProps, host }: MyAppProps) {
   );
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
+      <WalletProvider wallets={wallets}>
         <WalletModalProvider>
           <ConfigProvider baseUrl={baseUrl}>
             <ChakraProvider>
